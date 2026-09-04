@@ -3212,7 +3212,26 @@
 
         // Inicializar aplicación al cargar
         window.onload = init;
+// Inicializar aplicación al cargar
+        window.onload = init;
+
+        // Verificar cambios en el servidor cada 30 segundos
+        setInterval(async () => {
+            try {
+                const response = await fetch(window.location.href, { cache: 'no-store' });
+                const text = await response.text();
+                
+                if (window.lastHtmlLength && window.lastHtmlLength !== text.length) {
+                    window.location.reload();
+                } else {
+                    window.lastHtmlLength = text.length;
+                }
+            } catch (e) {
+                console.log("Error al verificar actualizaciones", e);
+            }
+        }, 30000);
     </script>
 </body>
 </html>
+
     
