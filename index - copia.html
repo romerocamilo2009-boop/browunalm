@@ -1,0 +1,2386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>BROWUNAL - Brownies Artesanales</title>
+    
+    <!-- PWA Web App Manifest -->
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkJST1dVTkFMIiwKICAic2hvcnRfbmFtZSI6ICJCUk9XVU5BTCIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMGEwYTBhIiwKICAidGhlbWVfY29sb3IiOiAiIzBhMGEwYSIKfQ==">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BROWUNAL">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- jsPDF para exportación PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --card-bg: #141414;
+            --card-border: #2a2a2a;
+            --primary-gold: #d4af37;
+            --primary-gold-hover: #f3e5ab;
+            --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            --dark-gradient: linear-gradient(180deg, #111111 0%, #050505 100%);
+            --text: #f5f5f5;
+            --text-muted: #a3a3a3;
+            --border: #262626;
+            --shadow: 0 4px 20px -2px rgba(212, 175, 55, 0.12);
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            padding-bottom: 90px;
+        }
+
+        /* Header Layout */
+        header {
+            background: #111111;
+            border-bottom: 1px solid #222222;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo-img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-gold);
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .admin-badge {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--primary-gold);
+            color: var(--primary-gold);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .admin-badge:hover {
+            background: var(--primary-gold);
+            color: #000;
+        }
+
+        /* Container & Navigation */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        /* Pestañas más grandes, robustas y cuadradas */
+        .nav-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            background: #121212;
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .tab-btn {
+            padding: 16px 8px;
+            border: 1px solid var(--border);
+            background: #1e1e1e;
+            font-weight: 800;
+            font-size: 14px;
+            color: var(--text);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            text-align: center;
+            white-space: normal;
+            word-wrap: break-word;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 52px;
+        }
+
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(90deg, transparent, #d4af37, #fcf6ba, #d4af37, transparent);
+            background-size: 200% 100%;
+            border-radius: 8px;
+            z-index: -1;
+            opacity: 0.3;
+            animation: goldLight 3s linear infinite;
+        }
+
+        @keyframes goldLight {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .tab-btn.active {
+            background: var(--gold-gradient);
+            color: #000;
+            border-color: var(--primary-gold);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.5);
+            transform: scale(1.02);
+        }
+
+        /* Guía con Flechas Doradas */
+        .user-guide-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(212, 175, 55, 0.08);
+            border: 1px solid var(--primary-gold);
+            padding: 8px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary-gold);
+            text-align: center;
+        }
+
+        .user-guide-flow span {
+            animation: pulseArrow 1.5s infinite alternate;
+        }
+
+        @keyframes pulseArrow {
+            0% { opacity: 0.4; transform: translateX(-2px); }
+            100% { opacity: 1; transform: translateX(2px); }
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Hero Display */
+        .hero-banner {
+            text-align: center;
+            margin-bottom: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 20px;
+            border-radius: var(--radius);
+        }
+
+        .hero-logo {
+            width: 140px;
+            height: 140px;
+            border-radius: 16px;
+            object-fit: cover;
+            border: 2px solid var(--primary-gold);
+            box-shadow: var(--shadow);
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .hero-logo:hover {
+            transform: scale(1.03);
+        }
+
+        /* Product Cards */
+        .product-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 14px;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            position: relative;
+        }
+
+        .product-card.out-of-stock {
+            opacity: 0.6;
+        }
+
+        .product-img-wrapper {
+            width: 90px;
+            height: 90px;
+            min-width: 90px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--primary-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .product-img-wrapper::after {
+            content: '🔍';
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            font-size: 11px;
+            background: rgba(0,0,0,0.6);
+            padding: 2px 4px;
+            border-radius: 4px;
+            color: #fff;
+        }
+
+        .product-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: #ffffff;
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-info h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .product-info p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .product-action {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 4px;
+        }
+
+        .product-price {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--primary-gold);
+        }
+
+        .btn-add {
+            background: var(--gold-gradient);
+            color: #000;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 12px;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        .btn-add:active {
+            transform: scale(0.95);
+        }
+
+        .btn-add:hover {
+            opacity: 0.9;
+        }
+
+        .btn-disabled {
+            background: #444 !important;
+            color: #888 !important;
+            cursor: not-allowed !important;
+        }
+
+        /* Customization Block */
+        .custom-builder {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+        }
+
+        .topping-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .topping-checkbox {
+            display: none;
+        }
+
+        .topping-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #181818;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+
+        .topping-checkbox:checked + .topping-label {
+            border-color: var(--primary-gold);
+            background: rgba(212, 175, 55, 0.15);
+            color: var(--primary-gold);
+        }
+
+        .topping-container.out-of-stock {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Form elements */
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--primary-gold);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            background: #1a1a1a;
+            color: var(--text);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-gold);
+            background: #222222;
+        }
+
+        /* Payment Info Cards */
+        .payment-info-box {
+            background: #181818;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .payment-info-box strong {
+            color: var(--primary-gold);
+        }
+
+        /* Cart Summary */
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .cart-qty {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: #262626;
+            color: var(--text);
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .promo-box {
+            display: flex;
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .btn-apply {
+            background: var(--gold-gradient);
+            color: #000;
+            border: none;
+            padding: 0 16px;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .summary-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 16px;
+            border: 1px solid var(--card-border);
+            margin-top: 16px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .summary-row.total {
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-gold);
+        }
+
+        .btn-whatsapp {
+            width: 100%;
+            background: #25d366;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            margin-top: 16px;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.2);
+        }
+
+        /* Banner PWA */
+        .pwa-banner {
+            background: #181818;
+            border: 1px solid var(--primary-gold);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Admin Dashboard */
+        .admin-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 16px;
+            border: 1px solid var(--card-border);
+            margin-bottom: 16px;
+        }
+
+        .badge-slot {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            background: rgba(212, 175, 55, 0.2);
+            color: var(--primary-gold);
+            margin-bottom: 4px;
+        }
+
+        .order-card {
+            border-left: 4px solid var(--primary-gold);
+            padding: 12px;
+            background: #181818;
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+        }
+
+        /* Bottom Cart Bar */
+        .floating-cart-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #111111;
+            padding: 12px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.5);
+            z-index: 90;
+        }
+
+        .floating-cart-btn {
+            background: var(--gold-gradient);
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        /* Modal para ver Imagen Grande */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .image-modal.active {
+            display: flex;
+        }
+
+        .modal-content-img {
+            max-width: 90%;
+            max-height: 80vh;
+            border-radius: 16px;
+            border: 2px solid var(--primary-gold);
+            background-color: #ffffff;
+            object-fit: contain;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+        }
+
+        .modal-caption {
+            color: #fff;
+            margin-top: 15px;
+            font-size: 16px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-gold);
+            color: #000;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .category-filters {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+            padding-bottom: 4px;
+        }
+
+        .cat-btn {
+            background: #181818;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .cat-btn.active {
+            background: var(--primary-gold);
+            color: #000;
+            border-color: var(--primary-gold);
+        }
+
+        .review-card {
+            background: #181818;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .promo-card {
+            background: #1c1917;
+            border: 1px solid var(--primary-gold);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        /* Modal para Edición de Productos */
+        .edit-product-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2100;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .edit-product-modal.active {
+            display: flex;
+        }
+
+        .edit-product-content {
+            background: var(--card-bg);
+            border: 1px solid var(--primary-gold);
+            border-radius: var(--radius);
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Estilo para la Barra Flotante de Notificación de Actualizaciones */
+        .update-toast-bar {
+            position: fixed;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gold-gradient);
+            color: #000;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 13px;
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.6);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            animation: bounceIn 0.5s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: translate(-50%, -50px); opacity: 0; }
+            100% { transform: translate(-50%, 0); opacity: 1; }
+        }
+    </style>
+</head>
+<body onload="init()">
+
+    <!-- NOTIFICACIÓN FLOTANTE PARA ACTUALIZAR TIENDA -->
+    <div id="updateToast" class="update-toast-bar" onclick="manualRefreshData()">
+        🔄 Nuevos cambios en la tienda. <u>Pulsa para actualizar</u>
+    </div>
+
+    <header>
+        <div class="header-top">
+            <div class="logo-container">
+                <img src="https://i.ibb.co/CKMVVVfZ/Whats-App-Image-2026-09-02-at-10-08-30-PM.jpg" alt="BROWUNAL Logo" class="brand-logo-img">
+                <div class="logo-text">BROWUNAL</div>
+            </div>
+            <button class="admin-badge" onclick="playEffect(); openAdminWithPIN()">⚙️ Admin</button>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- Banner PWA -->
+        <div class="pwa-banner" id="pwaBanner">
+            <span>📲 Instala <b>BROWUNAL</b> en tu dispositivo: Pulsa <b>Compartir</b> y 'Agregar a inicio'.</span>
+            <button onclick="document.getElementById('pwaBanner').style.display='none'" style="border:none;background:none;color:var(--primary-gold);font-weight:bold;cursor:pointer;">✕</button>
+        </div>
+
+        <!-- Indicador visual de secuencia de pedido -->
+        <div class="user-guide-flow">
+            🛒 <span>Tienda</span> ➔ 🍫 <span>Toppings</span> ➔ 📦 <span>Carrito</span>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="hero-banner">
+            <img src="https://i.ibb.co/CKMVVVfZ/Whats-App-Image-2026-09-02-at-10-08-30-PM.jpg" alt="BROWUNAL Brownies" class="hero-logo" onclick="openImageModal('https://i.ibb.co/CKMVVVfZ/Whats-App-Image-2026-09-02-at-10-08-30-PM.jpg', 'BROWUNAL Brownies Artesanales')">
+            <h2 style="font-size:18px; color:var(--primary-gold); margin-bottom:4px;">Brownies Caseros</h2>
+            <p style="font-size:13px; color:var(--text-muted);">Hecho con amor para hacer tu día mejor</p>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="playEffect(); switchSection('tienda')">Tienda</button>
+            <button class="tab-btn" onclick="playEffect(); switchSection('promociones')">Promociones</button>
+            <button class="tab-btn" onclick="playEffect(); switchSection('puntos')">Puntos Brown</button>
+            <button class="tab-btn" onclick="playEffect(); switchSection('personalizar')">Toppings</button>
+            <button class="tab-btn" onclick="playEffect(); switchSection('carrito')">Carrito (<span id="cartCount">0</span>)</button>
+        </div>
+
+        <!-- SECTION: TIENDA -->
+        <div id="tienda" class="section active">
+            <div class="category-filters">
+                <button class="cat-btn active" onclick="playEffect(); filterCategory('all', this)">Todos</button>
+                <button class="cat-btn" onclick="playEffect(); filterCategory('tradicional', this)">Tradicionales</button>
+                <button class="cat-btn" onclick="playEffect(); filterCategory('especial', this)">Especiales</button>
+            </div>
+
+            <div class="product-grid" id="productGrid"></div>
+
+            <div style="margin-top:24px;">
+                <h4 style="color:var(--primary-gold); margin-bottom:12px;">💬 Lo que dicen nuestros clientes</h4>
+                <div id="reviewsList">
+                    <div class="review-card">
+                        <strong style="color:var(--primary-gold);">⭐ 5.0 - Camila R.</strong>
+                        <p style="color:var(--text-muted); margin-top:4px;">"Los mejores brownies del campus. El de arequipe siempre llega fresquito a Ágora."</p>
+                    </div>
+                    <div class="review-card">
+                        <strong style="color:var(--primary-gold);">⭐ 5.0 - Mateo G.</strong>
+                        <p style="color:var(--text-muted); margin-top:4px;">"Excelente atención y el sistema de puntos realmente te da premios gratis rápido."</p>
+                    </div>
+                </div>
+                
+                <div style="background:#181818; padding:12px; border-radius:12px; border:1px solid var(--border); margin-top:10px;">
+                    <span style="font-size:13px; font-weight:700; color:var(--primary-gold);">Déjanos tu opinión</span>
+                    <input type="text" id="revName" class="form-control" placeholder="Tu nombre" style="margin-top:6px; font-size:12px; padding:8px;">
+                    <textarea id="revComment" class="form-control" rows="2" placeholder="Escribe tu comentario..." style="margin-top:6px; font-size:12px; padding:8px;"></textarea>
+                    <button class="btn-add" style="margin-top:8px; width:100%;" onclick="playEffect(); submitReview()">Enviar Reseña</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: PROMOCIONES -->
+        <div id="promociones" class="section">
+            <h3 style="color:var(--primary-gold); margin-bottom:12px;">🔥 Promociones Especiales</h3>
+            <div id="promosUserList"></div>
+        </div>
+
+        <!-- SECTION: PUNTOS BROWN -->
+        <div id="puntos" class="section">
+            <div class="custom-builder">
+                <h3 style="color:var(--primary-gold); margin-bottom:8px;">🎁 Club Puntos Brown</h3>
+                <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">Gana 1 Punto Brown por cada $5.000 consumidos + Puntos extra por tus productos y toppings favoritos. Consulta tus puntos o canjea tus premios:</p>
+                
+                <div class="form-group">
+                    <label>Tu Teléfono Registrado</label>
+                    <div style="display:flex; gap:8px;">
+                        <input type="tel" id="puntosTel" class="form-control" placeholder="Ej: 3001234567">
+                        <button class="btn-add" style="padding:0 16px;" onclick="playEffect(); consultarPuntos()">Buscar</button>
+                    </div>
+                </div>
+
+                <div id="puntosBalanceBox" style="display:none; background:#181818; padding:16px; border-radius:12px; border:1px solid var(--primary-gold); margin-bottom:16px; text-align:center;">
+                    <span style="font-size:13px; color:var(--text-muted);">Puntos acumulados:</span>
+                    <div style="font-size:28px; font-weight:800; color:var(--primary-gold); margin-top:4px;"><span id="puntosDisplay">0</span> PTS</div>
+                </div>
+
+                <h4 style="color:var(--primary-gold); margin:16px 0 12px;">Catálogo de Premios</h4>
+                <div id="rewardsList" style="display:flex; flex-direction:column; gap:12px;"></div>
+            </div>
+        </div>
+
+        <!-- SECTION: TOPPINGS -->
+        <div id="personalizar" class="section">
+            <div class="custom-builder">
+                <h3 style="color:var(--primary-gold); margin-bottom:8px;">Crea tu Brownie Único</h3>
+                <p style="font-size:13px; color:var(--text-muted);">Base de brownie clásico ($5.000) + tus toppings favoritos:</p>
+                
+                <div class="topping-group" id="toppingGroupContainer"></div>
+
+                <div style="font-size:16px; font-weight:800; margin:16px 0; color:var(--primary-gold);">
+                    Precio: $<span id="customPrice">5000</span>
+                </div>
+
+                <button class="btn-add" style="width:100%; padding:14px; font-size:15px;" onclick="playEffect(); addCustomToCart()">Agregar Personalizado al Carrito</button>
+            </div>
+        </div>
+
+        <!-- SECTION: CARRITO & CHECKOUT -->
+        <div id="carrito" class="section">
+            <h3 style="margin-bottom:12px; color:var(--primary-gold);">Tu Carrito</h3>
+            <div id="cartItems">
+                <p style="text-align:center; color:var(--text-muted); padding:20px;">Tu carrito está vacío</p>
+            </div>
+
+            <!-- Promociones / Códigos -->
+            <div class="promo-box">
+                <input type="text" id="promoCode" class="form-control" placeholder="Código de descuento (ej: BROW10)">
+                <button class="btn-apply" onclick="playEffect(); applyPromo()">Aplicar</button>
+            </div>
+
+            <!-- Datos de Entrega y Cliente -->
+            <div style="background:var(--card-bg); padding:16px; border-radius:var(--radius); border:1px solid var(--card-border); margin-top:16px;">
+                <h4 style="margin-bottom:12px; color:var(--primary-gold);">Datos de Entrega</h4>
+                
+                <div class="form-group">
+                    <label>Tipo / Zona de Entrega</label>
+                    <select id="selectZona" class="form-control" onchange="updateShippingCost()">
+                        <option value="agora" data-cost="0">Entrega Gratuita en Punto Ágora</option>
+                        <option value="domicilio" data-cost="3000">Domicilio Externo (+$3.000)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Día de Entrega</label>
+                    <select id="selectDia" class="form-control" onchange="updateHorarios()">
+                        <option value="">Selecciona un día</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Hora Disponible</label>
+                    <select id="selectHora" class="form-control">
+                        <option value="">Selecciona un día primero</option>
+                    </select>
+                </div>
+
+                <h4 style="margin:16px 0 12px; color:var(--primary-gold);">Datos del Cliente</h4>
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="custNombre" class="form-control" placeholder="Tu nombre">
+                </div>
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="tel" id="custTel" class="form-control" placeholder="Ej: 3001234567">
+                </div>
+                <div class="form-group">
+                    <label>Forma de Pago</label>
+                    <select id="custPago" class="form-control" onchange="togglePaymentDetails()">
+                        <option value="Nequi">Nequi</option>
+                        <option value="Bancolombia">Bancolombia</option>
+                        <option value="Efectivo en Ágora">Efectivo al recibir en Ágora</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="cashAmountBox" style="display:none;">
+                    <label>¿Con cuánto dinero vas a pagar? (Ej: 10mil, 20mil)</label>
+                    <input type="text" id="custCashAmount" class="form-control" placeholder="Ej: $20.000">
+                </div>
+
+                <div id="paymentDetails" class="payment-info-box">
+                    <div id="nequiDetail">
+                        📱 <strong>Nequi:</strong> 302 679 7442
+                    </div>
+                    <div id="bancolombiaDetail" style="display:none;">
+                        🏦 <strong>Bancolombia (Cuenta de Ahorros):</strong> 91298220364
+                    </div>
+                    <div style="margin-top:10px;" id="proofContainer">
+                        <label style="font-size:11px; color:var(--primary-gold); display:block; margin-bottom:4px;">Adjuntar Comprobante/Pantallazo (Requerido para transferencia):</label>
+                        <input type="file" id="payProof" accept="image/*" class="form-control" style="font-size:11px; padding:6px;" onchange="handleProofUpload(event)">
+                        <span id="proofStatus" style="font-size:10px; color:#22c55e; display:none; margin-top:2px;">✓ Imagen cargada correctamente</span>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top:14px;">
+                    <label>Observaciones o Notas</label>
+                    <textarea id="custNotas" class="form-control" rows="2" placeholder="Notas especiales sobre tu entrega..."></textarea>
+                </div>
+            </div>
+
+            <!-- Resumen -->
+            <div class="summary-card">
+                <div class="summary-row"><span>Subtotal:</span> <span>$<span id="subtotalVal">0</span></span></div>
+                <div class="summary-row" id="shippingRow" style="display:none;"><span>Envío:</span> <span>+$<span id="shippingVal">0</span></span></div>
+                <div class="summary-row" id="discountRow" style="display:none; color:#22c55e;"><span>Descuento:</span> <span>-$<span id="discountVal">0</span></span></div>
+                <div class="summary-row total"><span>Total:</span> <span>$<span id="totalVal">0</span></span></div>
+            </div>
+
+            <button class="btn-whatsapp" onclick="playEffect(); sendWhatsApp()">
+                Enviar Pedido por WhatsApp
+            </button>
+        </div>
+
+        <!-- SECTION: ADMIN PANEL -->
+        <div id="admin" class="section">
+            <div class="admin-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <h3 style="color:var(--primary-gold);">Panel de Administración</h3>
+                    <button style="border:none; background:#fee2e2; color:#dc2626; padding:6px 12px; border-radius:8px; font-weight:700; cursor:pointer;" onclick="playEffect(); logoutAdmin()">Cerrar Sesión</button>
+                </div>
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:16px;">Panel exclusivo del administrador.</p>
+
+                <div style="background:rgba(212,175,55,0.15); border:1px solid var(--primary-gold); padding:12px; border-radius:12px; margin-bottom:16px; text-align:center;">
+                    <button class="btn-add" style="width:100%; padding:12px; font-size:14px; background:var(--gold-gradient);" onclick="playEffect(); triggerGlobalSync(true)">
+                        💾 Guardar y Publicar Cambios Inmediatamente
+                    </button>
+                    <span style="font-size:10px; color:var(--text-muted); display:block; margin-top:4px;">Tus cambios se auto-guardan y transmiten automáticamente en máximo 1 minuto.</span>
+                </div>
+
+                <!-- Métricas -->
+                <h4 style="margin-bottom:8px; color:var(--primary-gold);">📊 Métricas del Negocio</h4>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px;">
+                    <div style="background:#181818; padding:10px; border-radius:8px; text-align:center; border:1px solid var(--border);">
+                        <span style="font-size:11px; color:var(--text-muted);">Ventas Totales</span>
+                        <div style="font-size:16px; font-weight:800; color:var(--primary-gold);" id="adminTotalSales">$0</div>
+                    </div>
+                    <div style="background:#181818; padding:10px; border-radius:8px; text-align:center; border:1px solid var(--border);">
+                        <span style="font-size:11px; color:var(--text-muted);">Pedidos Totales</span>
+                        <div style="font-size:16px; font-weight:800; color:var(--primary-gold);" id="adminTotalOrders">0</div>
+                    </div>
+                </div>
+
+                <!-- Toppings -->
+                <h4 style="margin-bottom:8px; color:var(--primary-gold);">🍫 Agregar Nuevo Topping</h4>
+                <div style="background:#181818; padding:12px; border-radius:10px; border:1px solid var(--border); margin-bottom:16px; display:flex; flex-direction:column; gap:8px;">
+                    <input type="text" id="newToppingName" class="form-control" placeholder="Nombre del Topping (Ej: Nutella Extra)">
+                    <input type="number" id="newToppingPrice" class="form-control" placeholder="Precio ($)">
+                    <button class="btn-add" onclick="playEffect(); createTopping()">➕ Agregar Topping</button>
+                </div>
+
+                <h4 style="margin-bottom:8px; color:var(--primary-gold);">⚙️ Configurar Precios, Stock y Quitar Toppings</h4>
+                <div id="adminToppingsConfigList" style="margin-bottom:16px; display:flex; flex-direction:column; gap:8px;"></div>
+
+                <!-- Productos -->
+                <h4 style="margin-bottom:8px; color:var(--primary-gold);">🛍️ Agregar Nuevo Producto a la Tienda</h4>
+                <div style="background:#181818; padding:12px; border-radius:10px; border:1px solid var(--border); margin-bottom:16px; display:flex; flex-direction:column; gap:8px;">
+                    <input type="text" id="newProdName" class="form-control" placeholder="Nombre del Producto">
+                    <div style="display:flex; gap:8px;">
+                        <input type="number" id="newProdPrice" class="form-control" placeholder="Precio ($)">
+                        <select id="newProdCategory" class="form-control">
+                            <option value="tradicional">Tradicional</option>
+                            <option value="especial">Especial</option>
+                        </select>
+                    </div>
+                    <textarea id="newProdDesc" class="form-control" placeholder="Descripción del Producto..."></textarea>
+                    
+                    <label style="font-size:11px; color:var(--text-muted);">Subir Pantallazo / Foto de Producto:</label>
+                    <input type="file" id="newProdImgFile" accept="image/*" class="form-control" onchange="handleNewProductImg(event)">
+                    
+                    <label style="font-size:11px; color:var(--text-muted);">O URL de la Imagen (opcional):</label>
+                    <input type="text" id="newProdImgUrl" class="form-control" placeholder="https://ejemplo.com/imagen.jpg">
+                    
+                    <button class="btn-add" style="margin-top:4px;" onclick="playEffect(); createProduct()">➕ Agregar Producto a la Tienda</button>
+                </div>
+
+                <h4 style="margin-bottom:8px; color:var(--primary-gold);">📦 Gestión Completa de Productos en Tienda</h4>
+                <div id="adminProductsList" style="margin-bottom:16px; display:flex; flex-direction:column; gap:10px;"></div>
+
+                <!-- Promociones -->
+                <h4 style="margin-bottom:8px; color:var(--primary-gold);">Crear Promoción Publicitaria</h4>
+                <div style="background:#181818; padding:12px; border-radius:10px; border:1px solid var(--border); margin-bottom:16px; display:flex; flex-direction:column; gap:8px;">
+                    <input type="text" id="adminPromoTitle" class="form-control" placeholder="Título de la Promoción">
+                    <textarea id="adminPromoDesc" class="form-control" placeholder="Descripción de la promoción..."></textarea>
+                    <label style="font-size:11px; color:var(--text-muted);">Imagen de la Promoción:</label>
+                    <input type="file" id="adminPromoImg" accept="image/*" class="form-control" onchange="handleAdminPromoImg(event)">
+                    <label style="font-size:11px; color:var(--text-muted);">Fecha y Hora Límite:</label>
+                    <input type="datetime-local" id="adminPromoExpire" class="form-control">
+                    <button class="btn-add" onclick="playEffect(); createBannerPromo()">Publicar Promoción</button>
+                </div>
+                <div id="adminPromosList" style="margin-bottom:16px;"></div>
+
+                <!-- Descuentos -->
+                <h4 style="margin-bottom:8px;">Códigos de Descuento Automáticos</h4>
+                <div style="background:#181818; padding:12px; border-radius:10px; border:1px solid var(--border); margin-bottom:16px; display:flex; flex-direction:column; gap:8px;">
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="newPromoCode" class="form-control" placeholder="CÓDIGO (ej: BROW10)">
+                        <input type="number" id="newPromoPct" class="form-control" placeholder="% Desc" style="width:100px;">
+                    </div>
+                    <label style="font-size:11px; color:var(--text-muted);">Expira automáticamente el:</label>
+                    <input type="datetime-local" id="newPromoExpire" class="form-control">
+                    <button class="btn-add" onclick="playEffect(); createPromoCode()">Crear Código</button>
+                </div>
+                <div id="adminCodesList" style="margin-bottom:16px;"></div>
+
+                <h4 style="margin-bottom:8px;">Precios Rápidos y Disponibilidad</h4>
+                <div id="adminPrices" style="margin-bottom:16px;"></div>
+
+                <!-- Puntos Brown -->
+                <h4 style="margin-bottom:8px; color:var(--primary-gold);">Gestión Puntos Brown</h4>
+                <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px; background:#181818; padding:12px; border-radius:10px; border:1px solid var(--border);">
+                    <div style="display:flex; gap:8px;">
+                        <input type="tel" id="adminUserTel" class="form-control" placeholder="Teléfono Cliente">
+                        <input type="number" id="adminUserPts" class="form-control" placeholder="Puntos" style="width:100px;">
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn-add" style="flex:1;" onclick="playEffect(); adminAdjustPoints('add')">Sumar</button>
+                        <button class="btn-add" style="flex:1; background:#dc2626; color:#fff;" onclick="playEffect(); adminAdjustPoints('set')">Fijar Exactos</button>
+                    </div>
+                </div>
+
+                <h4 style="margin-bottom:8px; color:var(--primary-gold);">Administrar Catálogo de Premios</h4>
+                <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px; background:#181818; padding:12px; border-radius:10px; border:1px solid var(--border);">
+                    <input type="text" id="newRewardName" class="form-control" placeholder="Nombre del Premio">
+                    <div style="display:flex; gap:8px;">
+                        <input type="number" id="newRewardCost" class="form-control" placeholder="Puntos Necesarios">
+                        <button class="btn-add" onclick="playEffect(); createReward()">Guardar Premio</button>
+                    </div>
+                </div>
+                <div id="adminRewardsList" style="margin-bottom:16px;"></div>
+
+                <!-- Historial Pedidos -->
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <h4>Historial de Pedidos</h4>
+                    <button class="btn-add" style="font-size:10px; padding:6px 10px; background:var(--gold-gradient);" onclick="playEffect(); exportOrdersToPDF()">📄 Descargar PDF</button>
+                </div>
+
+                <div style="display:flex; gap:8px; margin-bottom:12px;">
+                    <button style="flex:1; background:#dc2626; color:#fff; border:none; padding:8px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;" onclick="playEffect(); clearSalesHistory()">🗑️ Eliminar Historial de Ventas</button>
+                    <button style="flex:1; background:#b91c1c; color:#fff; border:none; padding:8px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;" onclick="playEffect(); clearPDFHistory()">📄 Eliminar PDF Historial</button>
+                </div>
+
+                <div id="adminOrders"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Floating Bottom Bar -->
+    <div class="floating-cart-bar" id="floatingBar">
+        <div>
+            <span style="font-size:12px; color:var(--text-muted);">Total estimado:</span>
+            <div style="font-size:16px; font-weight:800; color:var(--primary-gold);">$<span id="floatTotal">0</span></div>
+        </div>
+        <button class="floating-cart-btn" onclick="playEffect(); switchSection('carrito')">Ver Pedido</button>
+    </div>
+
+    <!-- MODAL PARA VER IMAGEN EN GRANDE -->
+    <div class="image-modal" id="imageModal" onclick="closeImageModal()">
+        <button class="modal-close-btn" onclick="closeImageModal()">✕</button>
+        <img src="" id="modalImage" class="modal-content-img" onclick="event.stopPropagation()">
+        <div class="modal-caption" id="modalCaption"></div>
+    </div>
+
+    <!-- MODAL PARA EDITAR PRODUCTO DESDE EL ADMIN -->
+    <div class="edit-product-modal" id="editProductModal">
+        <div class="edit-product-content">
+            <h3 style="color:var(--primary-gold); margin-bottom:12px;">Editar Producto</h3>
+            <input type="hidden" id="editProdIndex">
+            
+            <div class="form-group">
+                <label>Nombre del Producto</label>
+                <input type="text" id="editProdName" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>Precio ($)</label>
+                <input type="number" id="editProdPrice" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>Categoría</label>
+                <select id="editProdCategory" class="form-control">
+                    <option value="tradicional">Tradicional</option>
+                    <option value="especial">Especial</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="editProdDesc" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Actualizar Imagen (Pantallazo/Foto)</label>
+                <input type="file" id="editProdImgFile" accept="image/*" class="form-control" onchange="handleEditProductImg(event)">
+            </div>
+
+            <div class="form-group">
+                <label>URL de Imagen Actual/Nueva</label>
+                <input type="text" id="editProdImgUrl" class="form-control">
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:16px;">
+                <button class="btn-add" style="flex:1;" onclick="playEffect(); saveProductEdit()">Guardar Cambios</button>
+                <button class="btn-add" style="flex:1; background:#444; color:#fff;" onclick="playEffect(); closeEditProductModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WHATSAPP_NUMBER = "573026797442";
+        const ADMIN_PIN = "3006230907";
+        let isAdminLoggedIn = false;
+
+        let products = JSON.parse(localStorage.getItem('brown_products_db')) || [
+            { 
+                id: 'clasico', 
+                name: 'Brownie Clásico', 
+                price: 5000, 
+                category: 'tradicional',
+                available: true,
+                desc: 'El sabor tradicional, suave e intenso a chocolate.',
+                img: 'https://i.ibb.co/0V1R9GLC/Whats-App-Image-2026-09-03-at-9-21-01-AM-1.jpg'
+            },
+            { 
+                id: 'chispas', 
+                name: 'Brownie Chispas', 
+                price: 6000, 
+                category: 'tradicional',
+                available: true,
+                desc: 'Con abundantes chispas de chocolate crujientes.',
+                img: 'https://i.ibb.co/76bh5p0/Whats-App-Image-2026-09-03-at-9-21-01-AM.jpg'
+            },
+            { 
+                id: 'arequipe', 
+                name: 'Brownie Arequipe', 
+                price: 6000, 
+                category: 'especial',
+                available: true,
+                desc: 'Relleno y cubierta de espeso arequipe artesanal.',
+                img: 'https://i.ibb.co/WvRQpkDd/Whats-App-Image-2026-09-03-at-9-21-00-AM.jpg'
+            },
+            { 
+                id: 'oreo', 
+                name: 'Brownie Oreo', 
+                price: 6000, 
+                category: 'especial',
+                available: true,
+                desc: 'Deliciosa combinación de chocolate suave con trozos crujientes de galleta Oreo.',
+                img: 'https://i.ibb.co/CKMVVVfZ/Whats-App-Image-2026-09-02-at-10-08-30-PM.jpg'
+            },
+            { 
+                id: 'nutella', 
+                name: 'Brownie Nutella', 
+                price: 6000, 
+                category: 'especial',
+                available: true,
+                desc: 'Con una suave y cremosa capa superior de irresistible crema de avellanas Nutella.',
+                img: 'https://i.ibb.co/CKMVVVfZ/Whats-App-Image-2026-09-02-at-10-08-30-PM.jpg'
+            }
+        ];
+
+        let toppings = JSON.parse(localStorage.getItem('brown_toppings_db')) || [
+            { id: 'top-arequipe', name: 'Arequipe', price: 1000, available: true },
+            { id: 'top-chispas', name: 'Chispas', price: 1000, available: true },
+            { id: 'top-oreo', name: 'Oreo', price: 1500, available: true },
+            { id: 'top-mani', name: 'Maní', price: 1000, available: true },
+            { id: 'top-mm', name: 'M&M', price: 1500, available: true },
+            { id: 'top-nutella', name: 'Nutella', price: 1500, available: true },
+            { id: 'top-mermelada-mora', name: 'Mermelada de Mora', price: 1000, available: true },
+            { id: 'top-mira', name: 'Mira', price: 1000, available: true },
+            { id: 'top-quipitos', name: 'Quipitos', price: 1000, available: true }
+        ];
+
+        let userPointsDatabase = JSON.parse(localStorage.getItem('brown_points_db')) || {};
+        let rewardsDatabase = JSON.parse(localStorage.getItem('brown_rewards_db')) || [
+            { id: 'rew_1', name: 'Topping Gratis Extra', cost: 5 },
+            { id: 'rew_2', name: 'Brownie Clásico Gratis', cost: 15 },
+            { id: 'rew_3', name: 'Brownie Especial Gratis', cost: 20 }
+        ];
+
+        let ordersDatabase = JSON.parse(localStorage.getItem('brown_orders_db')) || [];
+        let promotionsList = JSON.parse(localStorage.getItem('brown_promotions_db')) || [];
+        let discountCodesDB = JSON.parse(localStorage.getItem('brown_codes_db')) || [
+            { code: 'BROW10', pct: 10, expire: null }
+        ];
+
+        const horarios = {
+            "Martes": ["10:00 AM - 12:00 PM", "2:00 PM - 4:00 PM"],
+            "Miércoles": ["10:00 AM - 2:30 PM"],
+            "Jueves": ["4:00 PM - 6:00 PM"],
+            "Viernes": ["10:00 AM - 2:30 PM"]
+        };
+
+        const diasSemanaMap = { 0: "Domingo", 1: "Lunes", 2: "Martes", 3: "Miércoles", 4: "Jueves", 5: "Viernes", 6: "Sábado" };
+
+        let cart = [];
+        let activeDiscount = 0;
+        let shippingCost = 0;
+        let currentCategory = 'all';
+        let proofBase64 = null;
+        let adminPromoImageBase64 = null;
+        let newProdImageBase64 = null;
+        let editProdImageBase64 = null;
+
+        function playEffect() {
+            if (navigator.vibrate) {
+                navigator.vibrate(25);
+            }
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, ctx.currentTime);
+                gain.gain.setValueAtTime(0.05, ctx.currentTime);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.05);
+            } catch(e) {}
+        }
+
+        function init() {
+            cleanExpiredItems();
+            renderProducts();
+            renderToppingsUI();
+            renderAdminPrices();
+            renderAdminProducts();
+            renderAdminToppingsConfig();
+            renderRewards();
+            renderAdminRewards();
+            renderAdminOrders();
+            renderPromotionsUser();
+            renderAdminPromotions();
+            renderAdminCodes();
+            populateValidDays();
+            updateCartUI();
+            togglePaymentDetails();
+        }
+
+        function saveProductsDB() { localStorage.setItem('brown_products_db', JSON.stringify(products)); triggerGlobalSync(); }
+        function saveToppingsDB() { localStorage.setItem('brown_toppings_db', JSON.stringify(toppings)); triggerGlobalSync(); }
+        function savePointsDB() { localStorage.setItem('brown_points_db', JSON.stringify(userPointsDatabase)); triggerGlobalSync(); }
+        function saveRewardsDB() { localStorage.setItem('brown_rewards_db', JSON.stringify(rewardsDatabase)); triggerGlobalSync(); }
+        function saveOrdersDB() { localStorage.setItem('brown_orders_db', JSON.stringify(ordersDatabase)); triggerGlobalSync(); }
+        function savePromotionsDB() { localStorage.setItem('brown_promotions_db', JSON.stringify(promotionsList)); triggerGlobalSync(); }
+        function saveCodesDB() { localStorage.setItem('brown_codes_db', JSON.stringify(discountCodesDB)); triggerGlobalSync(); }
+
+        function cleanExpiredItems() {
+            const now = new Date().getTime();
+            promotionsList = promotionsList.filter(p => !p.expire || new Date(p.expire).getTime() > now);
+            discountCodesDB = discountCodesDB.filter(c => !c.expire || new Date(c.expire).getTime() > now);
+            savePromotionsDB();
+            saveCodesDB();
+        }
+
+        function populateValidDays() {
+            const selectDia = document.getElementById('selectDia');
+            selectDia.innerHTML = '<option value="">Selecciona un día</option>';
+
+            const now = new Date();
+            const currentDayName = diasSemanaMap[now.getDay()];
+            const currentHour = now.getHours();
+            const currentMinutes = now.getMinutes();
+
+            Object.keys(horarios).forEach(dia => {
+                let disabled = false;
+                if (dia === currentDayName) {
+                    if (dia === "Miércoles" && (currentHour > 10 || (currentHour === 10 && currentMinutes >= 0))) {
+                        disabled = true;
+                    } else if (dia === "Martes" && currentHour >= 10) {
+                        disabled = true;
+                    } else if (dia === "Jueves" && currentHour >= 16) {
+                        disabled = true;
+                    } else if (dia === "Viernes" && currentHour >= 10) {
+                        disabled = true;
+                    }
+                }
+
+                if (!disabled) {
+                    const option = document.createElement('option');
+                    option.value = dia;
+                    option.textContent = dia;
+                    selectDia.appendChild(option);
+                }
+            });
+        }
+
+        function filterCategory(cat, btn) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderProducts();
+        }
+
+        function handleProofUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    proofBase64 = evt.target.result;
+                    document.getElementById('proofStatus').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleAdminPromoImg(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    adminPromoImageBase64 = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleNewProductImg(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    newProdImageBase64 = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleEditProductImg(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    editProdImageBase64 = evt.target.result;
+                    document.getElementById('editProdImgUrl').value = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function submitReview() {
+            const name = document.getElementById('revName').value.trim();
+            const text = document.getElementById('revComment').value.trim();
+            if(name && text) {
+                const list = document.getElementById('reviewsList');
+                const revDiv = document.createElement('div');
+                revDiv.className = 'review-card';
+                revDiv.innerHTML = '<strong style="color:var(--primary-gold);">⭐ 5.0 - ' + name + '</strong><p style="color:var(--text-muted); margin-top:4px;">"' + text + '"</p>';
+                list.prepend(revDiv);
+                document.getElementById('revName').value = '';
+                document.getElementById('revComment').value = '';
+                alert('¡Gracias por tu valoración!');
+            } else {
+                alert('Por favor escribe tu nombre y comentario.');
+            }
+        }
+
+        function updateShippingCost() {
+            const sel = document.getElementById('selectZona');
+            const cost = parseInt(sel.options[sel.selectedIndex].getAttribute('data-cost')) || 0;
+            shippingCost = cost;
+            calculateTotals();
+        }
+
+        function consultarPuntos() {
+            const tel = document.getElementById('puntosTel').value.trim();
+            if(!tel) {
+                alert("Por favor ingresa tu número de teléfono.");
+                return;
+            }
+            const pts = userPointsDatabase[tel] || 0;
+            document.getElementById('puntosDisplay').innerText = pts;
+            document.getElementById('puntosBalanceBox').style.display = 'block';
+            renderRewards();
+        }
+
+        function renderRewards() {
+            const list = document.getElementById('rewardsList');
+            const tel = document.getElementById('puntosTel').value.trim();
+            const userPts = userPointsDatabase[tel] || 0;
+
+            let html = '';
+            rewardsDatabase.forEach(r => {
+                const canRedeem = userPts >= r.cost && tel !== '';
+                html += '<div style="background:#181818; padding:12px; border-radius:10px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">' +
+                    '<div>' +
+                        '<strong style="font-size:14px; color:var(--text);">' + r.name + '</strong>' +
+                        '<div style="font-size:12px; color:var(--primary-gold);">' + r.cost + ' Puntos Brown</div>' +
+                    '</div>' +
+                    '<button class="btn-add" ' + (canRedeem ? '' : 'style="opacity:0.5; cursor:not-allowed;"') + ' onclick="playEffect(); redeemReward(\'' + r.id + '\')">Canjear</button>' +
+                '</div>';
+            });
+            list.innerHTML = html;
+        }
+
+        function renderAdminRewards() {
+            const list = document.getElementById('adminRewardsList');
+            let html = '';
+            rewardsDatabase.forEach(r => {
+                html += '<div style="background:#181818; padding:8px 12px; border-radius:8px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">' +
+                    '<span style="font-size:12px; color:var(--text);">' + r.name + ' (' + r.cost + ' pts)</span>' +
+                    '<button style="background:#ef4444; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:700; cursor:pointer;" onclick="playEffect(); deleteReward(\'' + r.id + '\')">Eliminar</button>' +
+                '</div>';
+            });
+            list.innerHTML = html;
+        }
+
+        function deleteReward(rewardId) {
+            if(confirm("¿Estás seguro de eliminar este premio del catálogo?")) {
+                rewardsDatabase = rewardsDatabase.filter(r => r.id !== rewardId);
+                saveRewardsDB();
+                renderRewards();
+                renderAdminRewards();
+            }
+        }
+
+        function redeemReward(rewardId) {
+            const tel = document.getElementById('puntosTel').value.trim();
+            if(!tel) {
+                alert("Por favor ingresa y busca tu teléfono antes de canjear.");
+                return;
+            }
+            const reward = rewardsDatabase.find(r => r.id === rewardId);
+            const userPts = userPointsDatabase[tel] || 0;
+
+            if(userPts < reward.cost) {
+                alert("No tienes suficientes Puntos Brown para este premio.");
+                return;
+            }
+
+            userPointsDatabase[tel] -= reward.cost;
+            savePointsDB();
+            consultarPuntos();
+
+            const redeemCode = 'CUPON-' + Math.floor(1000 + Math.random() * 9000);
+
+            cart.push({
+                id: 'reward_' + Date.now(),
+                name: '🎁 PREMIO: ' + reward.name + ' (Cod: ' + redeemCode + ')',
+                price: 0,
+                qty: 1
+            });
+
+            updateCartUI();
+            alert('¡Premio "' + reward.name + '" canjeado con éxito!\nCódigo de verificación: ' + redeemCode);
+            switchSection('carrito');
+        }
+
+        function openImageModal(imgSrc, caption) {
+            const modal = document.getElementById('imageModal');
+            const img = document.getElementById('modalImage');
+            const cap = document.getElementById('modalCaption');
+            img.src = imgSrc;
+            cap.innerText = caption;
+            modal.classList.add('active');
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.remove('active');
+        }
+
+        function togglePaymentDetails() {
+            const pago = document.getElementById('custPago').value;
+            const detailsBox = document.getElementById('paymentDetails');
+            const nequi = document.getElementById('nequiDetail');
+            const bancolombia = document.getElementById('bancolombiaDetail');
+            const cashBox = document.getElementById('cashAmountBox');
+
+            if (pago === 'Nequi') {
+                detailsBox.style.display = 'block';
+                nequi.style.display = 'block';
+                bancolombia.style.display = 'none';
+                cashBox.style.display = 'none';
+            } else if (pago === 'Bancolombia') {
+                detailsBox.style.display = 'block';
+                nequi.style.display = 'none';
+                bancolombia.style.display = 'block';
+                cashBox.style.display = 'none';
+            } else {
+                detailsBox.style.display = 'none';
+                cashBox.style.display = 'block';
+            }
+        }
+
+        function openAdminWithPIN() {
+            if (isAdminLoggedIn) {
+                switchSection('admin');
+                return;
+            }
+
+            const inputPin = prompt("Introduce tu PIN secreto de Administrador:");
+            if (inputPin === ADMIN_PIN) {
+                isAdminLoggedIn = true;
+                alert("¡Acceso concedido como Administrador!");
+                switchSection('admin');
+            } else if (inputPin !== null) {
+                alert("PIN incorrecto. Acceso denegado.");
+            }
+        }
+
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            alert("Has cerrado la sesión de administrador.");
+            switchSection('tienda');
+        }
+
+        function switchSection(sectionId) {
+            if (sectionId === 'admin' && !isAdminLoggedIn) {
+                openAdminWithPIN();
+                return;
+            }
+
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(sectionId).classList.add('active');
+            
+            const btnIndex = ['tienda', 'promociones', 'puntos', 'personalizar', 'carrito'].indexOf(sectionId);
+            if(btnIndex !== -1) {
+                document.querySelectorAll('.tab-btn')[btnIndex].classList.add('active');
+            }
+
+            if(sectionId === 'admin') {
+                document.getElementById('floatingBar').style.display = 'none';
+            } else {
+                document.getElementById('floatingBar').style.display = 'flex';
+            }
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            let html = '';
+            for (let i = 0; i < products.length; i++) {
+                let p = products[i];
+                if(currentCategory !== 'all' && p.category !== currentCategory) continue;
+
+                const isAvailable = p.available !== false;
+                html += '<div class="product-card ' + (isAvailable ? '' : 'out-of-stock') + '">' +
+                    '<div class="product-img-wrapper" onclick="openImageModal(\'' + p.img + '\', \'' + p.name + '\')">' +
+                        '<img src="' + p.img + '" alt="' + p.name + '" class="product-img">' +
+                    '</div>' +
+                    '<div class="product-info">' +
+                        '<h3>' + p.name + (!isAvailable ? ' <span style="font-size:10px; color:#ef4444;">(Agotado)</span>' : '') + '</h3>' +
+                        '<p>' + p.desc + '</p>' +
+                        '<div class="product-action">' +
+                            '<div class="product-price">$' + p.price.toLocaleString() + '</div>' +
+                            (isAvailable ? 
+                                '<button class="btn-add" onclick="playEffect(); addToCart(\'' + p.id + '\')">Agregar</button>' : 
+                                '<button class="btn-add btn-disabled" disabled>Agotado</button>') +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            }
+            grid.innerHTML = html;
+        }
+
+        function createTopping() {
+            const name = document.getElementById('newToppingName').value.trim();
+            const price = parseInt(document.getElementById('newToppingPrice').value);
+
+            if (!name || isNaN(price) || price < 0) {
+                alert("Por favor ingresa un nombre y precio válidos para el topping.");
+                return;
+            }
+
+            const newTop = {
+                id: 'top_' + Date.now(),
+                name: name,
+                price: price,
+                available: true
+            };
+
+            toppings.push(newTop);
+            saveToppingsDB();
+            renderToppingsUI();
+            renderAdminToppingsConfig();
+
+            document.getElementById('newToppingName').value = '';
+            document.getElementById('newToppingPrice').value = '';
+
+            alert('¡Topping "' + name + '" agregado con éxito!');
+        }
+
+        function renderAdminToppingsConfig() {
+            const container = document.getElementById('adminToppingsConfigList');
+            if (!container) return;
+
+            let html = '';
+            toppings.forEach((top, idx) => {
+                const isAvail = top.available !== false;
+                html += '<div style="display:flex; gap:8px; align-items:center; background:#181818; padding:10px; border-radius:10px; border:1px solid var(--border); flex-wrap:wrap;">' +
+                    '<strong style="flex:1; min-width:120px; font-size:13px; color:var(--text);">' + top.name + '</strong>' +
+                    '<input type="number" value="' + top.price + '" id="topPriceInput_' + idx + '" class="form-control" style="width:90px; padding:6px; font-size:12px;" placeholder="Precio ($)">' +
+                    '<button class="btn-add" style="padding:6px 10px; font-size:11px;" onclick="playEffect(); updateToppingPrice(' + idx + ')">💾 Guardar</button>' +
+                    '<button class="btn-add" style="padding:6px 10px; font-size:11px; background:' + (isAvail ? '#ef4444' : '#22c55e') + '; color:#fff;" onclick="playEffect(); toggleToppingStock(' + idx + ')">' + (isAvail ? 'Agotar' : 'Activar') + '</button>' +
+                    '<button style="background:#dc2626; color:#fff; border:none; padding:6px 10px; border-radius:8px; font-weight:700; font-size:11px; cursor:pointer;" onclick="playEffect(); deleteTopping(' + idx + ')">🗑️ Quitar</button>' +
+                '</div>';
+            });
+            container.innerHTML = html;
+        }
+
+        function toggleToppingStock(idx) {
+            toppings[idx].available = !(toppings[idx].available !== false);
+            saveToppingsDB();
+            renderToppingsUI();
+            renderAdminToppingsConfig();
+        }
+
+        function updateToppingPrice(idx) {
+            const newPrice = parseInt(document.getElementById('topPriceInput_' + idx).value);
+            if (!isNaN(newPrice) && newPrice >= 0) {
+                toppings[idx].price = newPrice;
+                saveToppingsDB();
+                renderToppingsUI();
+                renderAdminToppingsConfig();
+                alert('Precio del topping "' + toppings[idx].name + '" actualizado a $' + newPrice);
+            } else {
+                alert('Ingresa un precio válido.');
+            }
+        }
+
+        function deleteTopping(idx) {
+            const top = toppings[idx];
+            if (confirm('¿Estás seguro de quitar el topping "' + top.name + '"?')) {
+                toppings.splice(idx, 1);
+                saveToppingsDB();
+                renderToppingsUI();
+                renderAdminToppingsConfig();
+                alert('Topping eliminado.');
+            }
+        }
+
+        function createProduct() {
+            const name = document.getElementById('newProdName').value.trim();
+            const price = parseInt(document.getElementById('newProdPrice').value);
+            const category = document.getElementById('newProdCategory').value;
+            const desc = document.getElementById('newProdDesc').value.trim();
+            const urlImg = document.getElementById('newProdImgUrl').value.trim();
+
+            if (!name || isNaN(price) || price <= 0) {
+                alert("Por favor ingresa un nombre y precio válidos para el producto.");
+                return;
+            }
+
+            const img = newProdImageBase64 || urlImg || 'https://i.ibb.co/CKMVVVfZ/Whats-App-Image-2026-09-02-at-10-08-30-PM.jpg';
+
+            const newProduct = {
+                id: 'prod_' + Date.now(),
+                name: name,
+                price: price,
+                category: category,
+                available: true,
+                desc: desc || 'Delicioso brownie casero de alta calidad.',
+                img: img
+            };
+
+            products.push(newProduct);
+            saveProductsDB();
+            renderProducts();
+            renderAdminPrices();
+            renderAdminProducts();
+
+            document.getElementById('newProdName').value = '';
+            document.getElementById('newProdPrice').value = '';
+            document.getElementById('newProdDesc').value = '';
+            document.getElementById('newProdImgUrl').value = '';
+            document.getElementById('newProdImgFile').value = '';
+            newProdImageBase64 = null;
+
+            alert('¡Producto "' + name + '" agregado con éxito a la tienda y disponible en Precios Rápidos!');
+        }
+
+        function renderAdminProducts() {
+            const container = document.getElementById('adminProductsList');
+            if (!container) return;
+
+            let html = '';
+            products.forEach((p, idx) => {
+                html += '<div style="background:#181818; padding:10px; border-radius:10px; border:1px solid var(--border); display:flex; gap:10px; align-items:center;">' +
+                    '<img src="' + p.img + '" style="width:50px; height:50px; object-fit:contain; border-radius:8px; background:#fff; border:1px solid var(--primary-gold);">' +
+                    '<div style="flex:1;">' +
+                        '<strong style="font-size:13px; color:var(--text); display:block;">' + p.name + '</strong>' +
+                        '<span style="font-size:12px; color:var(--primary-gold); font-weight:700;">$' + p.price.toLocaleString() + '</span> ' +
+                        '<span style="font-size:10px; color:var(--text-muted);">(' + p.category + ')</span>' +
+                    '</div>' +
+                    '<div style="display:flex; gap:6px;">' +
+                        '<button class="btn-add" style="padding:6px 10px; font-size:11px;" onclick="playEffect(); openEditProductModal(' + idx + ')">✏️ Editar</button>' +
+                        '<button style="background:#ef4444; color:#fff; border:none; padding:6px 10px; border-radius:8px; font-weight:700; font-size:11px; cursor:pointer;" onclick="playEffect(); deleteProduct(' + idx + ')">🗑️</button>' +
+                    '</div>' +
+                '</div>';
+            });
+            container.innerHTML = html;
+        }
+
+        function deleteProduct(idx) {
+            const prod = products[idx];
+            if (confirm('¿Estás seguro de que deseas eliminar "' + prod.name + '" de la tienda?')) {
+                products.splice(idx, 1);
+                saveProductsDB();
+                renderProducts();
+                renderAdminPrices();
+                renderAdminProducts();
+                alert('Producto eliminado de la tienda.');
+            }
+        }
+
+        function openEditProductModal(idx) {
+            const p = products[idx];
+            document.getElementById('editProdIndex').value = idx;
+            document.getElementById('editProdName').value = p.name;
+            document.getElementById('editProdPrice').value = p.price;
+            document.getElementById('editProdCategory').value = p.category || 'tradicional';
+            document.getElementById('editProdDesc').value = p.desc || '';
+            document.getElementById('editProdImgUrl').value = p.img || '';
+            editProdImageBase64 = null;
+            document.getElementById('editProdImgFile').value = '';
+
+            document.getElementById('editProductModal').classList.add('active');
+        }
+
+        function closeEditProductModal() {
+            document.getElementById('editProductModal').classList.remove('active');
+        }
+
+        function saveProductEdit() {
+            const idx = parseInt(document.getElementById('editProdIndex').value);
+            if (isNaN(idx) || !products[idx]) return;
+
+            const name = document.getElementById('editProdName').value.trim();
+            const price = parseInt(document.getElementById('editProdPrice').value);
+            const category = document.getElementById('editProdCategory').value;
+            const desc = document.getElementById('editProdDesc').value.trim();
+            const urlImg = document.getElementById('editProdImgUrl').value.trim();
+
+            if (!name || isNaN(price) || price <= 0) {
+                alert('Por favor ingresa un nombre y un precio válido.');
+                return;
+            }
+
+            products[idx].name = name;
+            products[idx].price = price;
+            products[idx].category = category;
+            products[idx].desc = desc;
+            products[idx].img = editProdImageBase64 || urlImg || products[idx].img;
+
+            saveProductsDB();
+            renderProducts();
+            renderAdminPrices();
+            renderAdminProducts();
+            closeEditProductModal();
+
+            alert('¡Producto actualizado correctamente!');
+        }
+
+        function renderToppingsUI() {
+            const container = document.getElementById('toppingGroupContainer');
+            let html = '';
+            toppings.forEach(top => {
+                const isAvail = top.available !== false;
+                html += '<div class="topping-container ' + (isAvail ? '' : 'out-of-stock') + '">' +
+                    '<input type="checkbox" id="' + top.id + '" class="topping-checkbox" value="' + top.name + '" data-price="' + top.price + '" ' + (isAvail ? '' : 'disabled') + ' onchange="calculateCustomPrice()">' +
+                    '<label for="' + top.id + '" class="topping-label"><span>' + top.name + (!isAvail ? ' (Agotado)' : '') + '</span> <span>+$' + top.price.toLocaleString() + '</span></label>' +
+                '</div>';
+            });
+            container.innerHTML = html;
+        }
+
+        function calculateCustomPrice() {
+            let base = 5000;
+            const checkboxes = document.querySelectorAll('.topping-checkbox:checked');
+            checkboxes.forEach(cb => {
+                base += parseInt(cb.getAttribute('data-price'));
+            });
+            document.getElementById('customPrice').innerText = base.toLocaleString();
+            return base;
+        }
+
+        function addCustomToCart() {
+            const selectedBoxes = Array.from(document.querySelectorAll('.topping-checkbox:checked'));
+            const selectedNames = selectedBoxes.map(cb => cb.value);
+            const price = calculateCustomPrice();
+            const name = 'Personalizado (' + (selectedNames.length > 0 ? selectedNames.join(', ') : 'Sin adicionales') + ')';
+
+            cart.push({
+                id: 'custom_' + Date.now(),
+                name: name,
+                price: price,
+                qty: 1,
+                toppingsCount: selectedNames.length
+            });
+
+            document.querySelectorAll('.topping-checkbox').forEach(cb => cb.checked = false);
+            calculateCustomPrice();
+
+            updateCartUI();
+            switchSection('carrito');
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if(!product || product.available === false) return;
+
+            const existing = cart.find(item => item.id === productId);
+
+            if(existing) {
+                existing.qty++;
+            } else {
+                cart.push({ id: product.id, name: product.name, price: product.price, qty: 1 });
+            }
+            updateCartUI();
+        }
+
+        function updateQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if(item) {
+                item.qty += delta;
+                if(item.qty <= 0) {
+                    cart = cart.filter(i => i.id !== id);
+                }
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cartItems');
+            const cartCount = document.getElementById('cartCount');
+            
+            const totalQty = cart.reduce((acc, item) => acc + item.qty, 0);
+            cartCount.innerText = totalQty;
+
+            if(cart.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:20px;">Tu carrito está vacío</p>';
+            } else {
+                let html = '';
+                for (let i = 0; i < cart.length; i++) {
+                    let item = cart[i];
+                    html += '<div class="cart-item">' +
+                        '<div>' +
+                            '<strong style="font-size:14px; color:var(--text);">' + item.name + '</strong>' +
+                            '<div style="font-size:12px; color:var(--primary-gold);">$' + item.price.toLocaleString() + ' c/u</div>' +
+                        '</div>' +
+                        '<div class="cart-qty">' +
+                            '<button class="qty-btn" onclick="playEffect(); updateQty(\'' + item.id + '\', -1)">-</button>' +
+                            '<span style="font-weight:700; font-size:14px;">' + item.qty + '</span>' +
+                            '<button class="qty-btn" onclick="playEffect(); updateQty(\'' + item.id + '\', 1)">+</button>' +
+                        '</div>' +
+                    '</div>';
+                }
+                container.innerHTML = html;
+            }
+
+            calculateTotals();
+        }
+
+        function calculateTotals() {
+            const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            const discount = (subtotal * activeDiscount) / 100;
+            const total = subtotal - discount + shippingCost;
+
+            document.getElementById('subtotalVal').innerText = subtotal.toLocaleString();
+            document.getElementById('totalVal').innerText = total.toLocaleString();
+            document.getElementById('floatTotal').innerText = total.toLocaleString();
+
+            if(shippingCost > 0) {
+                document.getElementById('shippingRow').style.display = 'flex';
+                document.getElementById('shippingVal').innerText = shippingCost.toLocaleString();
+            } else {
+                document.getElementById('shippingRow').style.display = 'none';
+            }
+
+            if(activeDiscount > 0) {
+                document.getElementById('discountRow').style.display = 'flex';
+                document.getElementById('discountVal').innerText = discount.toLocaleString();
+            } else {
+                document.getElementById('discountRow').style.display = 'none';
+            }
+        }
+
+        function applyPromo() {
+            const code = document.getElementById('promoCode').value.trim().toUpperCase();
+            cleanExpiredItems();
+            const foundCode = discountCodesDB.find(c => c.code === code);
+
+            if(foundCode) {
+                activeDiscount = foundCode.pct;
+                alert('¡Código aplicado! Descuento del ' + activeDiscount + '%');
+                calculateTotals();
+            } else {
+                alert('Código de descuento no válido o ya ha expirado.');
+            }
+        }
+
+        function updateHorarios() {
+            const dia = document.getElementById('selectDia').value;
+            const selectHora = document.getElementById('selectHora');
+            selectHora.innerHTML = '';
+
+            if(horarios[dia]) {
+                horarios[dia].forEach(h => {
+                    selectHora.innerHTML += '<option value="' + h + '">' + h + '</option>';
+                });
+            } else {
+                selectHora.innerHTML = '<option value="">Selecciona un día primero</option>';
+            }
+        }
+
+        function sendWhatsApp() {
+            if(cart.length === 0) {
+                alert('El carrito está vacío');
+                return;
+            }
+
+            const nombre = document.getElementById('custNombre').value.trim();
+            const tel = document.getElementById('custTel').value.trim();
+            const dia = document.getElementById('selectDia').value;
+            const hora = document.getElementById('selectHora').value;
+            const pago = document.getElementById('custPago').value;
+            const cashVal = document.getElementById('custCashAmount').value.trim();
+            const notas = document.getElementById('custNotas').value.trim();
+
+            if(!nombre) {
+                alert('Falta el nombre en la información.');
+                return;
+            }
+            if(!tel) {
+                alert('Falta el número telefónico en la información.');
+                return;
+            }
+            if(!dia) {
+                alert('Falta seleccionar el día de entrega.');
+                return;
+            }
+            if(!hora) {
+                alert('Falta seleccionar la hora disponible de entrega.');
+                return;
+            }
+
+            if((pago === 'Nequi' || pago === 'Bancolombia') && !proofBase64) {
+                alert('Hace falta tu pantallazo de transferencia antes de enviar el pedido.');
+                return;
+            }
+
+            const subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+            const total = subtotal - ((subtotal * activeDiscount) / 100) + shippingCost;
+            
+            let puntosGanados = Math.floor(total / 5000);
+            cart.forEach(item => {
+                if (item.id === 'clasico') puntosGanados += (2 * item.qty);
+                else if (item.id === 'chispas' || item.id === 'arequipe' || item.id === 'oreo' || item.id === 'nutella') puntosGanados += (3 * item.qty);
+                else if (item.toppingsCount) puntosGanados += (item.toppingsCount * item.qty);
+            });
+
+            userPointsDatabase[tel] = (userPointsDatabase[tel] || 0) + puntosGanados;
+            savePointsDB();
+
+            const newOrder = {
+                id: '#' + (1000 + ordersDatabase.length + 1),
+                nombre: nombre,
+                tel: tel,
+                items: cart.map(i => i.qty + 'x ' + i.name).join(', '),
+                total: total,
+                dia: dia,
+                hora: hora,
+                pago: pago,
+                fecha: new Date().toLocaleDateString()
+            };
+            ordersDatabase.push(newOrder);
+            saveOrdersDB();
+            renderAdminOrders();
+
+            let msg = "🟫 *--- NUEVO PEDIDO BROWUNAL ---* 🟫\n\n";
+            msg += "👤 *Cliente:* " + nombre + "\n";
+            msg += "📞 *Teléfono:* " + tel + "\n\n";
+            msg += "📜 *DETALLE DEL PEDIDO:*\n";
+
+            cart.forEach(item => {
+                msg += "🍫 " + item.qty + "x " + item.name + " - $" + (item.price * item.qty).toLocaleString() + "\n";
+            });
+
+            if(shippingCost > 0) {
+                msg += "\n🛵 *Costo Domicilio:* $" + shippingCost.toLocaleString() + "\n";
+            }
+
+            if(activeDiscount > 0) {
+                msg += "\n🏷️ *Descuento Aplicado:* " + activeDiscount + "%\n";
+            }
+            msg += "\n💰 *TOTAL A PAGAR:* $" + total.toLocaleString() + "\n";
+            msg += "🤎 *Puntos Brown Ganados:* +" + puntosGanados + " PTS\n";
+            msg += "🤎 *Puntos Brown Acumulados:* " + userPointsDatabase[tel] + " PTS\n\n";
+
+            msg += "📅 *DÍA DE ENTREGA:* " + dia + " (" + hora + ")\n";
+            msg += "📍 *Punto/Zona:* " + (shippingCost > 0 ? 'Domicilio External' : 'Punto Ágora (Gratis)') + "\n";
+            msg += "💳 *Forma de pago:* " + pago + "\n";
+
+            if(pago === 'Efectivo en Ágora' && cashVal) {
+                msg += "💵 *Cancela con:* " + cashVal + "\n";
+            }
+
+            if (pago === 'Nequi') {
+                msg += "📌 *Cuenta Nequi:* 302 679 7442\n";
+            } else if (pago === 'Bancolombia') {
+                msg += "📌 *Ahorros Bancolombia:* 91298220364\n";
+            }
+
+            if(proofBase64) {
+                msg += "📸 *Comprobante de Pago:* Adjuntado y cargado en el sistema.\n";
+            }
+
+            if(notas) msg += "📝 *Notas:* " + notas + "\n";
+
+            const url = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg);
+            window.open(url, '_blank');
+        }
+
+        function renderAdminPrices() {
+            const container = document.getElementById('adminPrices');
+            let html = '';
+            for (let idx = 0; idx < products.length; idx++) {
+                let p = products[idx];
+                const isAvail = p.available !== false;
+                html += '<div style="display:flex; gap:8px; align-items:center; margin-bottom:8px; background:#181818; padding:8px; border-radius:8px;">' +
+                    '<span style="flex:1; font-size:13px; color:var(--text);">' + p.name + '</span>' +
+                    '<input type="number" value="' + p.price + '" id="priceInput_' + idx + '" class="form-control" style="width:80px; padding:6px;">' +
+                    '<button class="btn-add" style="padding:6px 10px;" onclick="playEffect(); updatePrice(' + idx + ')">Guardar</button>' +
+                    '<button class="btn-add" style="padding:6px 10px; background:' + (isAvail ? '#ef4444' : '#22c55e') + '; color:#fff;" onclick="playEffect(); toggleStock(' + idx + ')">' + (isAvail ? 'Agotar' : 'Activar') + '</button>' +
+                '</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        function toggleStock(idx) {
+            products[idx].available = !(products[idx].available !== false);
+            saveProductsDB();
+            renderProducts();
+            renderAdminPrices();
+        }
+
+        function updatePrice(idx) {
+            const newPrice = parseInt(document.getElementById('priceInput_' + idx).value);
+            if(!isNaN(newPrice) && newPrice > 0) {
+                products[idx].price = newPrice;
+                saveProductsDB();
+                renderProducts();
+                renderAdminProducts();
+                alert('Precio actualizado correctamente');
+            }
+        }
+
+        function createBannerPromo() {
+            const title = document.getElementById('adminPromoTitle').value.trim();
+            const desc = document.getElementById('adminPromoDesc').value.trim();
+            const expire = document.getElementById('adminPromoExpire').value;
+
+            if (title && desc) {
+                promotionsList.push({
+                    id: 'promo_' + Date.now(),
+                    title: title,
+                    desc: desc,
+                    img: adminPromoImageBase64 || 'https://i.ibb.co/CKMVVVfZ/Whats-App-Image-2026-09-02-at-10-08-30-PM.jpg',
+                    expire: expire || null
+                });
+                savePromotionsDB();
+                renderPromotionsUser();
+                renderAdminPromotions();
+                alert('Promoción creada exitosamente.');
+                document.getElementById('adminPromoTitle').value = '';
+                document.getElementById('adminPromoDesc').value = '';
+                document.getElementById('adminPromoExpire').value = '';
+                adminPromoImageBase64 = null;
+            } else {
+                alert('Por favor ingresa un título y una descripción.');
+            }
+        }
+
+        function renderPromotionsUser() {
+            cleanExpiredItems();
+            const container = document.getElementById('promosUserList');
+            if(promotionsList.length === 0) {
+                container.innerHTML = '<p style="font-size:13px; color:var(--text-muted);">No hay promociones activas por ahora.</p>';
+                return;
+            }
+
+            let html = '';
+            promotionsList.forEach(p => {
+                html += '<div class="promo-card">' +
+                    '<img src="' + p.img + '" style="width:100%; height:160px; object-fit:cover; border-radius:8px; margin-bottom:8px; border:1px solid var(--primary-gold);">' +
+                    '<h4 style="color:var(--primary-gold); font-size:16px;">' + p.title + '</h4>' +
+                    '<p style="font-size:13px; color:var(--text-muted); margin-top:4px;">' + p.desc + '</p>' +
+                    (p.expire ? '<div style="font-size:11px; color:#ef4444; margin-top:6px;">⏰ Valida hasta: ' + new Date(p.expire).toLocaleString() + '</div>' : '') +
+                '</div>';
+            });
+            container.innerHTML = html;
+        }
+
+        function renderAdminPromotions() {
+            const container = document.getElementById('adminPromosList');
+            let html = '';
+            promotionsList.forEach(p => {
+                html += '<div style="background:#181818; padding:8px 12px; border-radius:8px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">' +
+                    '<span style="font-size:12px; color:var(--text);">' + p.title + '</span>' +
+                    '<button style="background:#ef4444; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:700; cursor:pointer;" onclick="playEffect(); deletePromotion(\'' + p.id + '\')">Eliminar</button>' +
+                '</div>';
+            });
+            container.innerHTML = html;
+        }
+
+        function deletePromotion(id) {
+            if(confirm("¿Deseas eliminar esta promoción?")) {
+                promotionsList = promotionsList.filter(p => p.id !== id);
+                savePromotionsDB();
+                renderPromotionsUser();
+                renderAdminPromotions();
+            }
+        }
+
+        function createPromoCode() {
+            const code = document.getElementById('newPromoCode').value.trim().toUpperCase();
+            const pct = parseInt(document.getElementById('newPromoPct').value);
+            const expire = document.getElementById('newPromoExpire').value;
+
+            if(code && !isNaN(pct)) {
+                discountCodesDB.push({ code: code, pct: pct, expire: expire || null });
+                saveCodesDB();
+                renderAdminCodes();
+                alert('Código ' + code + ' creado exitosamente.');
+                document.getElementById('newPromoCode').value = '';
+                document.getElementById('newPromoPct').value = '';
+                document.getElementById('newPromoExpire').value = '';
+            }
+        }
+
+        function renderAdminCodes() {
+            const container = document.getElementById('adminCodesList');
+            let html = '';
+            discountCodesDB.forEach((c, idx) => {
+                html += '<div style="background:#181818; padding:8px 12px; border-radius:8px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">' +
+                    '<span style="font-size:12px; color:var(--text);">' + c.code + ' (' + c.pct + '%) ' + (c.expire ? '- Expira: ' + new Date(c.expire).toLocaleDateString() : '') + '</span>' +
+                    '<button style="background:#ef4444; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:700; cursor:pointer;" onclick="playEffect(); deleteCode(' + idx + ')">Eliminar</button>' +
+                '</div>';
+            });
+            container.innerHTML = html;
+        }
+
+        function deleteCode(idx) {
+            if(confirm("¿Deseas eliminar este código de descuento?")) {
+                discountCodesDB.splice(idx, 1);
+                saveCodesDB();
+                renderAdminCodes();
+            }
+        }
+
+        function adminAdjustPoints(type) {
+            const tel = document.getElementById('adminUserTel').value.trim();
+            const pts = parseInt(document.getElementById('adminUserPts').value);
+
+            if(!tel || isNaN(pts)) {
+                alert("Por favor ingresa un teléfono y una cantidad válida de puntos.");
+                return;
+            }
+
+            if(type === 'add') {
+                userPointsDatabase[tel] = (userPointsDatabase[tel] || 0) + pts;
+            } else {
+                userPointsDatabase[tel] = pts;
+            }
+
+            savePointsDB();
+            alert("Puntos de " + tel + " actualizados a: " + userPointsDatabase[tel] + " PTS");
+            document.getElementById('adminUserTel').value = '';
+            document.getElementById('adminUserPts').value = '';
+        }
+
+        function createReward() {
+            const name = document.getElementById('newRewardName').value.trim();
+            const cost = parseInt(document.getElementById('newRewardCost').value);
+
+            if(name && !isNaN(cost) && cost > 0) {
+                rewardsDatabase.push({
+                    id: 'rew_' + Date.now(),
+                    name: name,
+                    cost: cost
+                });
+                saveRewardsDB();
+                renderRewards();
+                renderAdminRewards();
+                alert("Premio '" + name + "' creado con éxito.");
+                document.getElementById('newRewardName').value = '';
+                document.getElementById('newRewardCost').value = '';
+            }
+        }
+
+        function renderAdminOrders() {
+            const container = document.getElementById('adminOrders');
+            const totalSalesEl = document.getElementById('adminTotalSales');
+            const totalOrdersEl = document.getElementById('adminTotalOrders');
+
+            totalOrdersEl.innerText = ordersDatabase.length;
+            const salesSum = ordersDatabase.reduce((acc, o) => acc + o.total, 0);
+            totalSalesEl.innerText = '$' + salesSum.toLocaleString();
+
+            if(ordersDatabase.length === 0) {
+                container.innerHTML = '<p style="font-size:12px; color:var(--text-muted);">No hay pedidos registrados aún.</p>';
+                return;
+            }
+
+            let html = '';
+            ordersDatabase.slice().reverse().forEach(o => {
+                html += '<div class="order-card">' +
+                    '<b>' + o.id + ' - ' + o.nombre + ' (' + o.tel + ')</b><br>' +
+                    o.items + ' ($' + o.total.toLocaleString() + ')<br>' +
+                    '<span class="badge-slot">' + o.dia + ' | ' + o.hora + '</span> - ' + o.pago +
+                '</div>';
+            });
+            container.innerHTML = html;
+        }
+
+        function clearSalesHistory() {
+            if (confirm("⚠️ ¿Estás seguro de que deseas eliminar todo el historial de ventas? Esta acción no se puede deshacer.")) {
+                ordersDatabase = [];
+                saveOrdersDB();
+                renderAdminOrders();
+                alert("El historial de ventas ha sido eliminado.");
+            }
+        }
+
+        function clearPDFHistory() {
+            if (confirm("⚠️ ¿Deseas borrar los registros asociados para la generación de archivos PDF?")) {
+                ordersDatabase = [];
+                saveOrdersDB();
+                renderAdminOrders();
+                alert("El registro de PDF ha sido reseteado.");
+            }
+        }
+
+        function exportOrdersToPDF() {
+            if(ordersDatabase.length === 0) {
+                alert('No hay pedidos para exportar en PDF.');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16);
+            doc.text("BROWUNAL - Historial de Pedidos", 14, 20);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.text("Fecha de reporte: " + new Date().toLocaleDateString(), 14, 28);
+
+            let yPos = 40;
+
+            ordersDatabase.forEach((o) => {
+                if (yPos > 270) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+
+                doc.setFont("helvetica", "bold");
+                doc.text(`${o.id} - ${o.nombre} (${o.tel})`, 14, yPos);
+                
+                doc.setFont("helvetica", "normal");
+                doc.text(`Productos: ${o.items}`, 14, yPos + 5);
+                doc.text(`Total: $${o.total.toLocaleString()} | Entrega: ${o.dia} (${o.hora}) | Pago: ${o.pago}`, 14, yPos + 10);
+                
+                doc.setLineWidth(0.2);
+                doc.line(14, yPos + 13, 196, yPos + 13);
+
+                yPos += 18;
+            });
+
+            doc.save("pedidos_browunal.pdf");
+        }
+
+        /* LÓGICA DE SINCRONIZACIÓN Y NOTIFICACIÓN DE CAMBIOS */
+        let syncChannel = null;
+        if (typeof BroadcastChannel !== 'undefined') {
+            syncChannel = new BroadcastChannel('browunal_sync_channel');
+            syncChannel.onmessage = function(event) {
+                if (event.data && event.data.type === 'DATA_UPDATED') {
+                    document.getElementById('updateToast').style.display = 'flex';
+                }
+            };
+        }
+
+        window.addEventListener('storage', function(e) {
+            if (e.key && e.key.startsWith('brown_')) {
+                document.getElementById('updateToast').style.display = 'flex';
+            }
+        });
+
+        function triggerGlobalSync(manualNotice = false) {
+            const timestamp = Date.now();
+            localStorage.setItem('browunal_last_sync_time', timestamp.toString());
+
+            if (syncChannel) {
+                syncChannel.postMessage({ type: 'DATA_UPDATED', timestamp: timestamp });
+            }
+
+            if (manualNotice) {
+                alert("¡Todos los cambios han sido guardados y enviados correctamente a la tienda!");
+            }
+        }
+
+        function manualRefreshData() {
+            reloadStoreData();
+            document.getElementById('updateToast').style.display = 'none';
+        }
+
+        function reloadStoreData() {
+            products = JSON.parse(localStorage.getItem('brown_products_db')) || products;
+            toppings = JSON.parse(localStorage.getItem('brown_toppings_db')) || toppings;
+            userPointsDatabase = JSON.parse(localStorage.getItem('brown_points_db')) || userPointsDatabase;
+            rewardsDatabase = JSON.parse(localStorage.getItem('brown_rewards_db')) || rewardsDatabase;
+            promotionsList = JSON.parse(localStorage.getItem('brown_promotions_db')) || promotionsList;
+            discountCodesDB = JSON.parse(localStorage.getItem('brown_codes_db')) || discountCodesDB;
+            ordersDatabase = JSON.parse(localStorage.getItem('brown_orders_db')) || ordersDatabase;
+
+            renderProducts();
+            renderToppingsUI();
+            renderAdminPrices();
+            renderAdminProducts();
+            renderAdminToppingsConfig();
+            renderRewards();
+            renderAdminRewards();
+            renderAdminOrders();
+            renderPromotionsUser();
+            renderAdminPromotions();
+            renderAdminCodes();
+        }
+    </script>
+</body>
+</html>
